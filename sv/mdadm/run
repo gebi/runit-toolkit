@@ -1,0 +1,2 @@
+#!/bin/sh
+exec mdadm --monitor --scan --syslog 2>&1
