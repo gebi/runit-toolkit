@@ -1,3 +1,4 @@
 #!/bin/sh
 
-exec smartd -d --interval=3600
+echo '**** Starting: approx'
+exec smartd -d --interval=3600 2>&1
