@@ -1,0 +1,3 @@
+#!/bin/sh
+
+exec smartd -d --interval=3600
