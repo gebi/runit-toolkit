@@ -1,0 +1,7 @@
+#!/bin/sh
+set -e
+
+PROVIDER="$(cat conf/PROVIDER)"
+
+echo "**** Starting: pppd"
+exec pppd call "$PROVIDER" nodetach 2>&1
