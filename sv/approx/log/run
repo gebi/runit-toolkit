@@ -1,7 +1,8 @@
 #!/bin/sh
 set -e
 
-LOG="/var/log/approx"
+LOGDIR="$(cat ../conf/LOGDIR)"
+LOGUSER="$(cat ../conf/LOGUSER)"
 
-test -d "$LOG" || mkdir -p -m2750 "$LOG" && chown approxlog:adm "$LOG"
-exec chpst -uapproxlog svlogd -tt -v "$LOG"
+test -d "$LOGDIR" || mkdir -p -m2750 "$LOGDIR" && chown "$LOGUSER":adm "$LOGDIR"
+exec chpst -u "$LOGUSER" svlogd -tt -v "$LOGDIR"

@@ -1,8 +1,8 @@
 #!/bin/sh
 set -e
 
-LOG_="/var/log/smartd"
-USER_="smartdlog"
+LOGDIR="$(cat ../conf/LOGDIR)"
+LOGUSER="$(cat ../conf/LOGUSER)"
 
-test -d "$LOG_" || mkdir -p -m2750 "$LOG_" && chown ${USER_}:adm "$LOG_"
-exec chpst -u${USER_} svlogd -tt -v "$LOG_"
+test -d "$LOGDIR" || mkdir -p -m2750 "$LOGDIR" && chown "$LOGUSER":adm "$LOGDIR"
+exec chpst -u "$LOGUSER" svlogd -tt -v "$LOGDIR"
