@@ -1,0 +1,3 @@
+#!/bin/sh
+
+sv s /etc/sv/* |grep -Ev "(: file does not exist)|(: not a directory)"
