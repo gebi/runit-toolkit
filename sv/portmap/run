@@ -1,0 +1,3 @@
+#!/bin/sh
+
+exec portmap -d 2>&1
