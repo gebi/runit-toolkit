@@ -1,0 +1,7 @@
+#!/bin/sh
+set -e
+exec 2>&1
+
+sv start dbus || ( echo "E: dbus not ready, exiting"; exit 1 )
+echo "**** Starting: hal"
+exec hald --daemon=no

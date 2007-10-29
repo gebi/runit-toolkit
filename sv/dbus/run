@@ -1,0 +1,20 @@
+#!/bin/sh
+set -e
+exec 2>&1
+
+DAEMONUSER=messagebus
+PIDDIR=/var/run/dbus
+PIDFILE=$PIDDIR/pid
+
+echo "**** Starting: dbus"
+#if [ ! -d $PIDDIR ]; then
+#    mkdir /var/run/dbus
+#    chown $USER_ /var/run/dbus
+#    chgrp $USER_ /var/run/dbus
+#fi
+if [ -e $PIDFILE ]; then
+    rm -f $PIDFILE
+    echo "W: removing $PIDFILE"
+fi
+dbus-uuidgen --ensure
+exec dbus-daemon --nofork --system
