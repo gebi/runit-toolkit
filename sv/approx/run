@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 
 echo '**** Starting: approx'
 exec approx -f 2>&1

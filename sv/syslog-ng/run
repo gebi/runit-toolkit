@@ -1,3 +1,4 @@
 #!/bin/sh
+set -e
 
 exec syslog-ng -F 2>&1

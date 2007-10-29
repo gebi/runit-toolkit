@@ -1,11 +1,10 @@
 #!/bin/sh
-
-exec 2>&1
+set -e
 
 # sshd wants to be started with absolute pathname
-SSHD=$(which sshd) || sv down $(pwd)
+SSHD=$(which sshd) || sv down .
 
 PRIVSEP_DIR=/var/run/sshd
 mkdir -p "$PRIVSEP_DIR"
 
-exec "$SSHD" -D
+exec "$SSHD" -D 2>&1

@@ -3,4 +3,4 @@ set -e
 
 chown root:lpadmin /usr/share/cups/model
 chmod 3775 /usr/share/cups/model
-exec cupsd -f
+exec cupsd -f 2>&1

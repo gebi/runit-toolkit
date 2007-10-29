@@ -1,4 +1,4 @@
 #!/bin/sh
+set -e
 
-echo "**** Starting: apache2"
 exec apache2 -DNO_DETACH 2>&1

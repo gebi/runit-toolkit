@@ -1,2 +1,4 @@
 #!/bin/sh
+set -e
+
 exec mdadm --monitor --scan --syslog 2>&1
