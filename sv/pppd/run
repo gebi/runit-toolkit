@@ -4,4 +4,4 @@ exec 2>&1
 
 echo "**** Starting: pppd"
 PROVIDER="$(cat conf/PROVIDER)"
-exec pppd call "$PROVIDER" nodetach 2>&1
+exec pppd call "$PROVIDER" nodetach
