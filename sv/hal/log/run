@@ -1,8 +1,0 @@
-#!/bin/sh
-set -e
-
-LOGDIR="$(cat ../conf/LOGDIR)"
-LOGUSER="$(cat ../conf/LOGUSER)"
-
-test -d "$LOGDIR" || mkdir -p -m2750 "$LOGDIR" && chown "$LOGUSER":adm "$LOGDIR"
-exec chpst -u "$LOGUSER" svlogd -tt -v "$LOGDIR"
