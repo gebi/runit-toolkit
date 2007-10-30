@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+
+postfix check
+exec /usr/lib/postfix/master 1>&2
