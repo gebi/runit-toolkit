@@ -1,0 +1,30 @@
+SVA(1)
+======
+Michael Gebetsroither <michael.geb@gmx.at>
+
+
+NAME
+----
+sva - program to list stats of all running services from runit
+
+
+SYNOPSIS
+--------
+*sva*
+
+
+DESCRIPTION
+-----------
+*sva* is a program that
+list stats of all running services, e.g ignoring anything that's not a running service in /etc/sv.
+
+SEE ALSO
+--------
+sv(8), runsv(8), chpst(8)
+
+
+AUTHOR
+------
+sva was written by Michael Gebetsroither <michael.geb@gmx.at>.
+
+This manual page was written by Michael Gebetsroither <gebi@grml.org>.
