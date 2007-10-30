@@ -33,8 +33,7 @@ install: build
 	cp -r lib/*             debian/grml-runit/lib/grml-runit
 	cp -a sv                debian/grml-runit/etc
 	@find debian/grml-runit/etc -iname log -type d |while read i; do \
-		test -e $$i/run || ln -sv /lib/grml-runit/scripts/common-log $$i/run \
-	done
+		test -e $$i/run || ln -sv /lib/grml-runit/scripts/common-log $$i/run; done
 
 	( cd docs && $(MAKE) install DESTDIR=../debian/grml-runit )
 
