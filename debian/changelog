@@ -1,0 +1,9 @@
+grml-runit (0.01) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Michael Gebetsroither <gebi@grml.org>  Tue, 30 Oct 2007 10:18:01 +0100
+
+Local variables:
+mode: debian-changelog
+End:

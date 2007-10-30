@@ -1,0 +1,19 @@
+Source: grml-runit
+Section: grml
+Priority: optional
+Maintainer: Michael Gebetsroither <gebi@grml.org>
+Build-Depends: debhelper (>= 4.0.0), xsltproc, docbook-xsl, asciidoc
+Standards-Version: 3.6.2
+Homepage: http://hg.grml.org/grml-runit/
+XS-Vcs-hg: http://hg.grml.org/grml-runit/
+XS-Vcs-Browser: http://hg.grml.org/grml-runit/
+
+Package: grml-runit
+Architecture: all
+Depends: runit (>> 1.3.1-0)
+Suggests: dbus (>> 1.1.1)
+Description: Grmls idea of service supervision using runit
+ This package contains runit supervised services in operation at grml
+ developers.
+ .
+ For more details take a look at the manpage grml-runit.
