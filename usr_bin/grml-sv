@@ -1,0 +1,211 @@
+#!/usr/bin/python
+
+import os
+import sys
+import subprocess
+import stfl
+import pwd
+import grp
+from stat import *
+
+# original from newsbeuter:filebrowser.stfl
+dia="""\
+vbox
+  @style_normal[background]:bg=black,fg=white
+  @info#style_normal[info]:bg=blue,fg=yellow,attr=bold
+  table
+    .expand:0 .height:1
+    label#info
+      .expand:0
+      text[head]:"Path: "
+    label#info
+      .expand:h
+      text[cwd]:""
+  list[files]
+    .expand:vh
+    style_normal[listnormal]:bg=black,fg=white
+    style_focus[listfocus]:fg=yellow,bg=blue,attr=bold
+    pos_name[listposname]:
+    pos[listpos]:0
+  table
+    .expand:0 .height:1
+    label
+      .expand:0
+      text[fileprompt]:"File: "
+    label[filename]
+      .expand:h
+      text[filenametext]:""
+  label#info
+    .expand:h .height:1
+    text[help]:"esc:Abort"
+  hbox[lastline]
+    .expand:0
+    label[msglabel]
+      text[msg]:""
+      .expand:h
+"""
+
+def getperm(perm):
+    ret = ""
+    strtab = ['---', '--x', '-w-', '-wx', 'r--', 'r-x', 'rw-', 'rwx']
+    for i in xrange(3):
+        ret = strtab[perm % 8] + ret
+        perm /= 8
+    return ret
+
+def trunc(string, width):
+    ret = string.rjust(width)
+    if len(string) > width:
+        ret = ret[:width-1] + '~'
+    return ret
+
+def fixwidth(str, width):
+    tmp = trunc(str, width)
+    return tmp.rjust(width)
+
+def filestr(path, filename):
+    file = os.path.join(path, filename)
+    type = '?'
+    st = os.lstat(file)
+    # mode
+    mode = st.st_mode
+    if   mode & S_IFREG:  type = '-'
+    elif mode & S_IFLNK:  type = 'l'
+    elif mode & S_IFDIR:  type = 'd'
+    elif mode & S_IFBLK:  type = 'b'
+    elif mode & S_IFCHR:  type = 'c'
+    elif mode & S_IFIFO:  type = 'p'
+    elif mode & S_IFSOCK: type = 's'
+    perm = getperm(mode & 0777)
+    nlink = trunc(str(st.st_nlink), 2)
+    uid = pwd.getpwuid(st.st_uid)[0]
+    uid = trunc(uid, 8)
+    gid = grp.getgrgid(st.st_gid)[0]
+    gid = trunc(gid, 8)
+    return '%s%s %s %s %s  %s' % (type, perm, nlink, uid, gid, filename)
+
+def update_list1(filename):
+    if not filename.startswith('/'):
+        filename = os.path.join(d.get('cwd'), filename)
+    filename = os.path.abspath(filename)
+    try:
+        tmp = ['{list',]
+        for i in os.listdir(filename):
+            if i == '.': continue
+            tmp.append('{listitem[%s] text:%s}' % (stfl.quote(i.replace(' ', '/')), stfl.quote(filestr(filename, i))))
+        tmp.append('}')
+        d.modify('files', 'replace_inner', ''.join(tmp))
+        d.set('cwd', filename)
+        d.set('msg', '')
+    except Exception, e:
+        d.set('msg', str(e))
+
+def loop1():
+    quit = False 
+    while not quit:
+        ev = d.run(0)
+        if not ev:
+            d.set('msg', 'no event')
+            continue
+        if ev == 'ENTER':
+            filename = d.get('filenametext')
+            if len(filename) == 0:
+                filename = d.get('listposname').strip('"')
+            update_list(filename)
+            d.set('filenametext', '')
+            continue
+        elif ev == 'ESC':
+            quit = True
+        elif ev == 'BACKSPACE':
+            fn = d.get('filenametext')
+            if len(fn) == 0:
+                update_list('..')
+                continue
+            d.set('filenametext', fn[:-1])
+        if len(ev) == 1:
+            fn = d.get('filenametext')
+            d.set('filenametext', fn + ev)
+        d.set('msg', ev) 
+
+def mysplit(s, sep, num, fill=None):
+    lst = s.split(sep, num);
+    if len(lst) < num:
+        lst.extend([fill]*(num-len(lst)))
+    return lst
+
+def get_info(s):
+    out = subprocess.Popen(['sv', 's', s], stdout=subprocess.PIPE).communicate()[0]
+    tmp = mysplit(out.strip(), ';', 2, '')
+    tmp = [ i.split(':') for i in tmp]
+    def extract(l):
+        if len(l) == 1:
+            return l
+        l = [ i.strip() for i in l ]
+        (x, p, t) = l[2].split(' ')
+        l[2] = p.rstrip(')')
+        l.append(t.rstrip('s'))
+        return l
+    main = extract(tmp[0])
+    if len(tmp[1]) > 1:
+        return [main, extract(tmp[1])]
+    else:
+        return [main]
+
+class Data(object):
+    def __init__(self, path):
+        self.data_ = []
+        self.maxlen_ = []
+        self.path_ = path
+        self.refresh()
+    def refresh(self):
+        self.data_ = []
+        for i in os.listdir(self.path_):
+            try:
+                tmp = get_info(i)
+                self.data_.append(tmp)
+                index = 0
+                for i in tmp[0]:
+                    try:
+                        tmpmax = self.maxlen_[index]
+                    except:
+                        self.maxlen_.append(0)
+                    self.maxlen_[index] = max(self.maxlen_[index], len(i))
+                    index += 1
+            except Exception, e:
+                self.data_.append(str(e))
+
+def get_name(item):
+    return item[0][1]
+
+def update_list(d, data):
+    tmp = ['{list',]
+    for i in data.data_:
+        tmp.append('{listitem[%s] text:%s}' %
+                (stfl.quote(get_name(i)), stfl.quote('\t'.join(i[0]))))
+    tmp.append('}')
+    #sys.stderr.write(''.join(tmp))
+    #sys.stderr.write('\n')
+    d.modify('files', 'replace_inner', ''.join(tmp))
+
+def loop(d, data):
+    quit = False
+    while not quit:
+        ret = d.run(2000)
+        if not ret:
+            continue
+        elif ret == 'ESC':
+            quit = True
+        elif ret == 'R' or ret == 'TIMEOUT':
+            data.refresh()
+            update_list(d, data)
+        elif len(ret) == 1:
+            d.set('msg', d.get('listposname'))
+
+if __name__ == "__main__":
+    #print get_info('hal')
+    #print get_info('cron')
+    #sys.exit(5)
+    data = Data('/var/service')
+    d = stfl.create(dia)
+    update_list(d, data)
+    loop(d, data)
