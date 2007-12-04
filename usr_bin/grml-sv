@@ -45,14 +45,6 @@ vbox
       .expand:h
 """
 
-def getperm(perm):
-    ret = ""
-    strtab = ['---', '--x', '-w-', '-wx', 'r--', 'r-x', 'rw-', 'rwx']
-    for i in xrange(3):
-        ret = strtab[perm % 8] + ret
-        perm /= 8
-    return ret
-
 def trunc(string, width):
     ret = string.rjust(width)
     if len(string) > width:
@@ -63,70 +55,6 @@ def fixwidth(str, width):
     tmp = trunc(str, width)
     return tmp.rjust(width)
 
-def filestr(path, filename):
-    file = os.path.join(path, filename)
-    type = '?'
-    st = os.lstat(file)
-    # mode
-    mode = st.st_mode
-    if   mode & S_IFREG:  type = '-'
-    elif mode & S_IFLNK:  type = 'l'
-    elif mode & S_IFDIR:  type = 'd'
-    elif mode & S_IFBLK:  type = 'b'
-    elif mode & S_IFCHR:  type = 'c'
-    elif mode & S_IFIFO:  type = 'p'
-    elif mode & S_IFSOCK: type = 's'
-    perm = getperm(mode & 0777)
-    nlink = trunc(str(st.st_nlink), 2)
-    uid = pwd.getpwuid(st.st_uid)[0]
-    uid = trunc(uid, 8)
-    gid = grp.getgrgid(st.st_gid)[0]
-    gid = trunc(gid, 8)
-    return '%s%s %s %s %s  %s' % (type, perm, nlink, uid, gid, filename)
-
-def update_list1(filename):
-    if not filename.startswith('/'):
-        filename = os.path.join(d.get('cwd'), filename)
-    filename = os.path.abspath(filename)
-    try:
-        tmp = ['{list',]
-        for i in os.listdir(filename):
-            if i == '.': continue
-            tmp.append('{listitem[%s] text:%s}' % (stfl.quote(i.replace(' ', '/')), stfl.quote(filestr(filename, i))))
-        tmp.append('}')
-        d.modify('files', 'replace_inner', ''.join(tmp))
-        d.set('cwd', filename)
-        d.set('msg', '')
-    except Exception, e:
-        d.set('msg', str(e))
-
-def loop1():
-    quit = False 
-    while not quit:
-        ev = d.run(0)
-        if not ev:
-            d.set('msg', 'no event')
-            continue
-        if ev == 'ENTER':
-            filename = d.get('filenametext')
-            if len(filename) == 0:
-                filename = d.get('listposname').strip('"')
-            update_list(filename)
-            d.set('filenametext', '')
-            continue
-        elif ev == 'ESC':
-            quit = True
-        elif ev == 'BACKSPACE':
-            fn = d.get('filenametext')
-            if len(fn) == 0:
-                update_list('..')
-                continue
-            d.set('filenametext', fn[:-1])
-        if len(ev) == 1:
-            fn = d.get('filenametext')
-            d.set('filenametext', fn + ev)
-        d.set('msg', ev) 
-
 def mysplit(s, sep, num, fill=None):
     lst = s.split(sep, num);
     if len(lst) < num:
@@ -134,6 +62,7 @@ def mysplit(s, sep, num, fill=None):
     return lst
 
 def get_info(s):
+    """Get information of specific service"""
     out = subprocess.Popen(['sv', 's', s], stdout=subprocess.PIPE).communicate()[0]
     tmp = mysplit(out.strip(), ';', 2, '')
     tmp = [ i.split(':') for i in tmp]
@@ -146,15 +75,13 @@ def get_info(s):
         l.append(t.rstrip('s'))
         return l
     main = extract(tmp[0])
-    if len(tmp[1]) > 1:
-        return [main, extract(tmp[1])]
-    else:
-        return [main]
+    log = extract(tmp[1])
+    return [main, log]
 
 class Data(object):
     def __init__(self, path):
         self.data_ = []
-        self.maxlen_ = []
+        self.maxlen_ = [0]*4
         self.path_ = path
         self.refresh()
     def refresh(self):
@@ -165,23 +92,29 @@ class Data(object):
                 self.data_.append(tmp)
                 index = 0
                 for i in tmp[0]:
-                    try:
-                        tmpmax = self.maxlen_[index]
-                    except:
-                        self.maxlen_.append(0)
                     self.maxlen_[index] = max(self.maxlen_[index], len(i))
                     index += 1
             except Exception, e:
-                self.data_.append(str(e))
+                #self.data_.append(str(e))
+                pass
+    def getfix(self, lst):
+        index = 0
+        tmp = []
+        for i in lst:
+            tmp.append(fixwidth(i, self.maxlen_[index]))
+            index += 1
+        return tmp
 
 def get_name(item):
     return item[0][1]
 
 def update_list(d, data):
     tmp = ['{list',]
+    data.data_.sort(key=lambda x: x[0][3])
     for i in data.data_:
+        tmplst = data.getfix(i[0])
         tmp.append('{listitem[%s] text:%s}' %
-                (stfl.quote(get_name(i)), stfl.quote('\t'.join(i[0]))))
+                (stfl.quote(get_name(i)), stfl.quote('\t'.join(tmplst))))
     tmp.append('}')
     #sys.stderr.write(''.join(tmp))
     #sys.stderr.write('\n')
@@ -190,7 +123,7 @@ def update_list(d, data):
 def loop(d, data):
     quit = False
     while not quit:
-        ret = d.run(2000)
+        ret = d.run(2200)
         if not ret:
             continue
         elif ret == 'ESC':
