@@ -4,6 +4,7 @@ import os
 import sys
 import subprocess
 import stfl
+import re
 import pwd
 import grp
 from stat import *
@@ -45,6 +46,8 @@ vbox
       .expand:h
 """
 
+info_extract_re = re.compile(r'(run|down): (.*?): \(pid (\d*?)\) (\d*?)s')
+
 def trunc(string, width):
     ret = string.rjust(width)
     if len(string) > width:
@@ -65,23 +68,17 @@ def get_info(s):
     """Get information of specific service"""
     out = subprocess.Popen(['sv', 's', s], stdout=subprocess.PIPE).communicate()[0]
     tmp = mysplit(out.strip(), ';', 2, '')
-    tmp = [ i.split(':') for i in tmp]
-    def extract(l):
-        if len(l) == 1:
-            return l
-        l = [ i.strip() for i in l ]
-        (x, p, t) = l[2].split(' ')
-        l[2] = p.rstrip(')')
-        l.append(t.rstrip('s'))
-        return l
-    main = extract(tmp[0])
-    log = extract(tmp[1])
-    return [main, log]
+    tmp = [ i.strip() for i in tmp]
+    main = info_extract_re.search(tmp[0]).groups()
+    if len(tmp[1]) >1:
+        return [main, info_extract_re.search(tmp[1]).groups()]
+    else:
+        return [main,]
 
 class Data(object):
     def __init__(self, path):
         self.data_ = []
-        self.maxlen_ = [0]*4
+        self.maxlen_ = [[0]*4]*2
         self.path_ = path
         self.refresh()
     def refresh(self):
@@ -90,10 +87,13 @@ class Data(object):
             try:
                 tmp = get_info(i)
                 self.data_.append(tmp)
-                index = 0
-                for i in tmp[0]:
-                    self.maxlen_[index] = max(self.maxlen_[index], len(i))
-                    index += 1
+                def getmax(src, dst):
+                    index = 0
+                    for i in src:
+                        dst[index] = max(dst[index], len(i))
+                        index += 1
+                getmax(self.data_[0]. self.maxlen_[0])
+                getmax(self.data_[1]. self.maxlen_[1])
             except Exception, e:
                 #self.data_.append(str(e))
                 pass
