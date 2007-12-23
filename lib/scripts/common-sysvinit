@@ -1,0 +1,13 @@
+#!/bin/sh
+
+cmd_=""
+
+case "$1" in
+    reload) cmd_='hup' ;;
+    restart) cmd_='force-restart' ;;
+    "") cmd_='s' ;;
+esac
+
+# for bash:
+# exec -a $(basename "$0") sv "$cmd_" $(basename "$0")
+exec sv "$cmd_" $(basename "$0")
