@@ -1,8 +1,24 @@
 #!/bin/sh
 set -e
 
-LOGDIR="$(cat ../conf/LOGDIR)"
-LOGUSER="$(cat ../conf/LOGUSER)"
+CONF_LOGDIR= "../conf/LOGDIR"
+CONF_LOGUSER="../conf/LOGUSER"
 
-test -d "$LOGDIR" || mkdir -p -m2750 "$LOGDIR" && chown "$LOGUSER":adm "$LOGDIR"
+SERVICE_NAME="$(basename $(cd ..; pwd))"
+
+if [ -e "$CONF_LOGDIR" ]; then
+    LOGDIR="$(cat $CONF_LOGDIR)"
+else
+    LOGDIR="/var/log/${SERVICE_NAME}"
+fi
+
+if [ -e "$CONF_LOGUSER" ]; then
+    LOGUSER="$(cat $CONF_LOGUSER)"
+else
+    LOGUSER="${SERVICE_NAME}log"
+fi
+
+if [ ! -d "$LOGDIR" ]; then
+    mkdir -p -m2750 "$LOGDIR" && chown "$LOGUSER":adm "$LOGDIR"
+fi
 exec chpst -u "$LOGUSER" svlogd -tt -v "$LOGDIR"
