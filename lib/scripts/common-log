@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-CONF_LOGDIR= "../conf/LOGDIR"
+CONF_LOGDIR="../conf/LOGDIR"
 CONF_LOGUSER="../conf/LOGUSER"
 
 SERVICE_NAME="$(basename $(cd ..; pwd))"
