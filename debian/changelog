@@ -1,3 +1,11 @@
+grml-runit (0.02) unstable; urgency=low
+
+  * changed common-log script to policy based logdir and loguser
+  * removed most conf/{LOGDIR,LOGUSER} (now servicename dependend)
+  * added git-daemon-run to conflicts
+
+ -- Michael Gebetsroither <gebi@grml.org>  Sat, 08 Mar 2008 19:10:44 +0100
+
 grml-runit (0.01) unstable; urgency=low
 
   * Initial Release.
