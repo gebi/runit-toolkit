@@ -1,1 +1,7 @@
 debian/grml-runit
+debian/files
+build-stamp
+.gz
+.html
+.xml
+.*.swp
