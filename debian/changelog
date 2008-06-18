@@ -1,3 +1,9 @@
+grml-runit (0.03) unstable; urgency=low
+
+  * dhcpd3: added conf/Interfaces
+
+ -- Michael Gebetsroither <gebi@grml.org>  Wed, 18 Jun 2008 15:27:33 +0200
+
 grml-runit (0.02) unstable; urgency=low
 
   * changed common-log script to policy based logdir and loguser
