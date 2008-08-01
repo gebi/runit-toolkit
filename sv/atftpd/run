@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+exec 2>&1
+
+echo "**** Starting: atftpd"
+BIND_ADDR="$(cat conf/BIND_ADDR)"
+if [ -n "$BIND_ADDR" ]; then
+    BIND_ADDR="--bind-address $BIND_ADDR"
+fi
+exec atftpd --no-fork --daemon $BIND_ADDR /var/lib/tftpboot
