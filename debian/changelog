@@ -1,8 +1,9 @@
 grml-runit (0.04) unstable; urgency=low
 
   * added atftpd 
+  * fixed binary-arch-rules-but-pkg-is-arch-indep in debian/rules
 
- -- Michael Gebetsroither <gebi@grml.org>  Sat, 02 Aug 2008 05:16:21 +0200
+ -- Michael Gebetsroither <gebi@grml.org>  Tue, 16 Sep 2008 22:47:47 +0200
 
 grml-runit (0.03) unstable; urgency=low
 
