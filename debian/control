@@ -3,7 +3,7 @@ Section: grml
 Priority: optional
 Maintainer: Michael Gebetsroither <gebi@grml.org>
 Build-Depends: debhelper (>= 4.0.0), xsltproc, docbook-xsl, asciidoc
-Standards-Version: 3.7.2
+Standards-Version: 3.7.3
 Homepage: http://hg.grml.org/grml-runit/
 XS-Vcs-hg: http://hg.grml.org/grml-runit/
 XS-Vcs-Browser: http://hg.grml.org/grml-runit/
