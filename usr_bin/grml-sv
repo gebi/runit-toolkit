@@ -1,0 +1,144 @@
+#!/usr/bin/python
+
+import os
+import sys
+import subprocess
+import stfl
+import re
+import pwd
+import grp
+from stat import *
+
+# original from newsbeuter:filebrowser.stfl
+dia="""\
+vbox
+  @style_normal[background]:bg=black,fg=white
+  @info#style_normal[info]:bg=blue,fg=yellow,attr=bold
+  table
+    .expand:0 .height:1
+    label#info
+      .expand:0
+      text[head]:"Path: "
+    label#info
+      .expand:h
+      text[cwd]:""
+  list[files]
+    .expand:vh
+    style_normal[listnormal]:bg=black,fg=white
+    style_focus[listfocus]:fg=yellow,bg=blue,attr=bold
+    pos_name[listposname]:
+    pos[listpos]:0
+  table
+    .expand:0 .height:1
+    label
+      .expand:0
+      text[fileprompt]:"File: "
+    label[filename]
+      .expand:h
+      text[filenametext]:""
+  label#info
+    .expand:h .height:1
+    text[help]:"esc:Abort"
+  hbox[lastline]
+    .expand:0
+    label[msglabel]
+      text[msg]:""
+      .expand:h
+"""
+
+info_extract_re = re.compile(r'(run|down): (.*?): \(pid (\d*?)\) (\d*?)s')
+
+def trunc(string, width):
+    ret = string.rjust(width)
+    if len(string) > width:
+        ret = ret[:width-1] + '~'
+    return ret
+
+def fixwidth(str, width):
+    tmp = trunc(str, width)
+    return tmp.rjust(width)
+
+def mysplit(s, sep, num, fill=None):
+    lst = s.split(sep, num);
+    if len(lst) < num:
+        lst.extend([fill]*(num-len(lst)))
+    return lst
+
+def get_info(s):
+    """Get information of specific service"""
+    out = subprocess.Popen(['sv', 's', s], stdout=subprocess.PIPE).communicate()[0]
+    tmp = mysplit(out.strip(), ';', 2, '')
+    tmp = [ i.strip() for i in tmp]
+    main = info_extract_re.search(tmp[0]).groups()
+    if len(tmp[1]) >1:
+        return [main, info_extract_re.search(tmp[1]).groups()]
+    else:
+        return [main,]
+
+class Data(object):
+    def __init__(self, path):
+        self.data_ = []
+        self.maxlen_ = [[0]*4]*2
+        self.path_ = path
+        self.refresh()
+    def refresh(self):
+        self.data_ = []
+        for i in os.listdir(self.path_):
+            try:
+                tmp = get_info(i)
+                self.data_.append(tmp)
+                def getmax(src, dst):
+                    index = 0
+                    for i in src:
+                        dst[index] = max(dst[index], len(i))
+                        index += 1
+                getmax(self.data_[0]. self.maxlen_[0])
+                getmax(self.data_[1]. self.maxlen_[1])
+            except Exception, e:
+                #self.data_.append(str(e))
+                pass
+    def getfix(self, lst):
+        index = 0
+        tmp = []
+        for i in lst:
+            tmp.append(fixwidth(i, self.maxlen_[index]))
+            index += 1
+        return tmp
+
+def get_name(item):
+    return item[0][1]
+
+def update_list(d, data):
+    tmp = ['{list',]
+    data.data_.sort(key=lambda x: x[0][3])
+    for i in data.data_:
+        tmplst = data.getfix(i[0])
+        tmp.append('{listitem[%s] text:%s}' %
+                (stfl.quote(get_name(i)), stfl.quote('\t'.join(tmplst))))
+    tmp.append('}')
+    #sys.stderr.write(''.join(tmp))
+    #sys.stderr.write('\n')
+    d.modify('files', 'replace_inner', ''.join(tmp))
+
+def loop(d, data):
+    quit = False
+    while not quit:
+        ret = d.run(2200)
+        if not ret:
+            continue
+        elif ret == 'ESC':
+            quit = True
+        elif ret == 'R' or ret == 'TIMEOUT':
+            data.refresh()
+            update_list(d, data)
+        elif len(ret) == 1:
+            d.set('msg', d.get('listposname'))
+
+if __name__ == "__main__":
+    #print get_info('hal')
+    #print get_info('cron')
+    #sys.exit(5)
+    data = Data('/var/service')
+    d = stfl.create(dia)
+    update_list(d, data)
+    loop(d, data)
