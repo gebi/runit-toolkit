@@ -29,7 +29,7 @@ install: build
 	dh_clean -k 
 	dh_installdirs
 
-	install -m 755 bin/sva  debian/grml-runit/usr/sbin
+	install -m 755 usr_sbin/sva  debian/grml-runit/usr/sbin
 	cp -r lib/*             debian/grml-runit/lib/grml-runit
 	cp -a sv                debian/grml-runit/etc
 	@find debian/grml-runit/etc -iname log -type d |while read i; do \
