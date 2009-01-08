@@ -2,4 +2,4 @@
 set -e
 
 echo '**** Starting: git-daemon'
-exec git-daemon --verbose --export-all --base-path=/var/cache /var/cache/git 2>&1
+exec git daemon --verbose --export-all --base-path=/var/cache /var/cache/git 2>&1
