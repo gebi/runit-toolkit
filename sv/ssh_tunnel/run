@@ -1,0 +1,20 @@
+#!/bin/sh
+set -e
+exec 2>&1
+
+NAME="$(basename "$(pwd)")"
+echo "**** Starting: $NAME"
+
+SERVER="$(cat conf/SERVER)"
+if [ -z "$SERVER" ]; then
+    echo "Error: no conf/SERVER given"
+    exit 1
+fi
+
+FORWARD="$(cat conf/FORWARD)"
+SSH_OPT="$(cat conf/SSH_OPT)"
+LOCAL_USER="$(cat conf/LOCAL_USER)"
+REMOTE_USER="$(cat conf/REMOTE_USER)"
+IDENTITY="$(cat conf/IDENTITY)"
+
+exec chpst -u "$LOCAL_USER" ssh $FORWARD $SSH_OPT -i "$IDENTITY" "${REMOTE_USER}@${SERVER}"

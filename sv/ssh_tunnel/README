@@ -1,0 +1,9 @@
+The only config setting to be configured is conf/SERVER for the target
+Default tunneling port is mysql from local to remote SERVER
+
+# the executed command with default settings
+exec chpst -u root:root \
+    ssh -4 -N -L 3306:localhost:3306 \
+        -o BatchMode=yes -o ServerAliveInterval=15 -o ServerAliveCountMax=3 \
+        -i /root/.ssh/id_rsa  tunnel@SERVER
+
