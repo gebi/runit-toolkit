@@ -1,0 +1,8 @@
+#!/bin/sh
+set -e
+exec 2>&1
+
+NAME="$(basename "$(pwd)")"
+echo "**** Starting: $NAME"
+
+exec chpst -u "www-data" davserver --directory /var/www -n --host localhost --port 8008
