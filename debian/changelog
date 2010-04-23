@@ -1,3 +1,9 @@
+grml-runit (0.05) UNRELEASED; urgency=low
+
+  * git-daemon: support git >1.6.0
+
+ -- Michael Gebetsroither <gebi@grml.org>  Thu, 08 Jan 2009 11:56:54 +0100
+
 grml-runit (0.04) unstable; urgency=low
 
   * added atftpd 
