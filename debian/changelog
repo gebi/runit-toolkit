@@ -1,6 +1,8 @@
-grml-runit (0.05) UNRELEASED; urgency=low
+grml-runit (0.05) unstable; urgency=medium
 
   * git-daemon: support git >1.6.0
+  * common-log: fix for customization of logdir and loguser
+  * added services: pywebdav, ssh_tunnel
 
  -- Michael Gebetsroither <gebi@grml.org>  Thu, 08 Jan 2009 11:56:54 +0100
 
