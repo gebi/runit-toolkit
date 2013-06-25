@@ -1,4 +1,4 @@
-debian/grml-runit
+debian/runit-toolkit
 debian/files
 build-stamp
 .gz
