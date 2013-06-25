@@ -29,13 +29,13 @@ install: build
 	dh_clean -k 
 	dh_installdirs
 
-	install -m 755 usr_sbin/sva  debian/grml-runit/usr/sbin
-	cp -r lib/*             debian/grml-runit/lib/grml-runit
-	cp -a sv                debian/grml-runit/etc
-	@find debian/grml-runit/etc -iname log -type d |while read i; do \
-		test -e $$i/run || ln -sv /lib/grml-runit/scripts/common-log $$i/run; done
+	install -m 755 usr_sbin/sva  debian/runit-toolkit/usr/sbin
+	cp -r lib/*             debian/runit-toolkit/lib/runit-toolkit
+	cp -a sv                debian/runit-toolkit/etc
+	@find debian/runit-toolkit/etc -iname log -type d |while read i; do \
+		test -e $$i/run || ln -sv /lib/runit-toolkit/scripts/common-log $$i/run; done
 
-	( cd docs && $(MAKE) install DESTDIR=../debian/grml-runit )
+	( cd docs && $(MAKE) install DESTDIR=../debian/runit-toolkit )
 
 # Build architecture-independent files here.
 binary-arch: build install

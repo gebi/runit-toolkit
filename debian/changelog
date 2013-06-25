@@ -1,3 +1,9 @@
+runit-toolkit (1.00) unstable; urgency=low
+
+  * Renamed to runit-toolkit.
+
+ -- Michael Gebetsroither <michael@mgeb.org>  Tue, 25 Jun 2013 17:28:51 +0200
+
 grml-runit (0.05) unstable; urgency=medium
 
   * git-daemon: support git >1.6.0
