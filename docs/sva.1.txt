@@ -1,6 +1,6 @@
 SVA(1)
 ======
-Michael Gebetsroither <michael.geb@gmx.at>
+Michael Gebetsroither <michael@mgeb.org>
 
 
 NAME
@@ -25,6 +25,6 @@ sv(8), runsv(8), chpst(8)
 
 AUTHOR
 ------
-sva was written by Michael Gebetsroither <michael.geb@gmx.at>.
+sva was written by Michael Gebetsroither <michael@mgeb.org>
 
-This manual page was written by Michael Gebetsroither <gebi@grml.org>.
+This manual page was written by Michael Gebetsroither <michael@mgeb.org>.
